@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+import com.payment.validation.model.Currency;
 import com.payment.validation.model.PaymentStatus;
 
 import lombok.AllArgsConstructor;
@@ -20,10 +21,10 @@ public class PaymentResponse {
 	private PaymentStatus status;
 	private String message;
 	private BigDecimal amount;
-	private String currency;
+	private Currency currency;
 	private String orderId;
 	private LocalDateTime timestamp;
-	public static PaymentResponse success(String message,BigDecimal amount,String currency,String orderID)
+	public static PaymentResponse success(String message,BigDecimal amount,Currency currency,String orderID)
 	{
 		return PaymentResponse.builder()
 				.paymentId(UUID.randomUUID().toString())
@@ -39,7 +40,7 @@ public class PaymentResponse {
 	{
 		return PaymentResponse.builder()
 				.paymentId(UUID.randomUUID().toString())
-				.status(PaymentStatus.SUCCESS)
+				.status(PaymentStatus.FAILED)
 				.message(message)
 				.timestamp(LocalDateTime.now())
 				.build();
