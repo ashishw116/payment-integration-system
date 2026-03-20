@@ -13,11 +13,11 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 	@Override
 	public PaymentResponse validatePayment(PaymentRequest request)
 	{
-		if(!Currency.isValid(request.getCurrency().name()))
+		if(request.getCurrency() == null || !Currency.isValid(request.getCurrency().name()))
 		{
 			return PaymentResponse.failure(PaymentConstants.INVALID_CURRENCY);
 		}
-		if(!PaymentMethod.isValid(request.getPaymentMethod().name()))
+		if(request.getPaymentMethod() == null || !PaymentMethod.isValid(request.getPaymentMethod().name()))
 		{
 			return PaymentResponse.failure(PaymentConstants.INVALID_PAYMENT_METHOD);
 		}
