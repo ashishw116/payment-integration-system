@@ -1,27 +1,65 @@
-# Maven
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# Compiled class files
+*.class
 
-# Eclipse/STS
-.apt_generated
+# Log files
+*.log
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# Maven target folders
+target/
+**/target/
+
+# IDE - Eclipse/STS
 .classpath
 .factorypath
 .project
-.settings
+.settings/
 .springBeans
-.sts4-cache
+.sts4-cache/
 
-# IntelliJ IDEA
-.idea
-*.iws
+# IDE - IntelliJ
+.idea/
 *.iml
+*.iws
 *.ipr
+out/
 
-# VS Code
+# IDE - VS Code
 .vscode/
 
-# Environment
+# Maven wrapper (optional to track)
+!**/mvnw
+!**/mvnw.cmd
+!**/.mvn/wrapper/maven-wrapper.properties
+
+# Environment files (NEVER commit!)
 .env
+.env.local
+*.env
+
+# AWS Keys (NEVER commit!)
 *.pem
+*.ppk
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Spring Boot
+application-local.properties
+application-local.yml
+
+# Test coverage
+/coverage
+
+# Logs folder
+logs/
