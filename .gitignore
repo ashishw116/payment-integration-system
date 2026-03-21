@@ -1,16 +1,10 @@
-# Compiled class file
+# Compiled class files
 *.class
 
-# Log file
+# Log files
 *.log
 
-# BlueJ files
-*.ctxt
-
-# Mobile Tools for Java (J2ME)
-.mtj.tmp/
-
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -19,6 +13,53 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
-hs_err_pid*
-replay_pid*
+# Maven target folders
+target/
+**/target/
+
+# IDE - Eclipse/STS
+.classpath
+.factorypath
+.project
+.settings/
+.springBeans
+.sts4-cache/
+
+# IDE - IntelliJ
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# IDE - VS Code
+.vscode/
+
+# Maven wrapper (optional to track)
+!**/mvnw
+!**/mvnw.cmd
+!**/.mvn/wrapper/maven-wrapper.properties
+
+# Environment files (NEVER commit!)
+.env
+.env.local
+*.env
+
+# AWS Keys (NEVER commit!)
+*.pem
+*.ppk
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Spring Boot
+application-local.properties
+application-local.yml
+
+# Test coverage
+/coverage
+
+# Logs folder
+logs/
