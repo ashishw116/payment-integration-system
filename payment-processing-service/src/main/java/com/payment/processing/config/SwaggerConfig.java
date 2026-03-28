@@ -1,21 +1,21 @@
-package com.payment.validation.config;
+package com.payment.processing.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.OpenAPI;
 
 @Configuration
 public class SwaggerConfig {
 	@Bean
-	public OpenAPI paymentOpenAPI()
+	public OpenAPI processingOpenAPI()
 	{
 		return new OpenAPI()
 				.info(new Info()
-						.title("Payment Validation API")
-						.description("Rule engine and pre-validation checks for the Payment Integration System")
+						.title("Payment Processing API")
+						.description("Core transaction engine for the Payment Integration System")
 						.version("1.0.0")
 						.contact(new Contact()
 								.name("Ashish Wagh")
