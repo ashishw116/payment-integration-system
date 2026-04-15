@@ -1,5 +1,6 @@
 package com.payment.validation.controller;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -7,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.payment.validation.model.request.PaymentRequest;
+import com.payment.validation.model.response.PaymentProcessResponse;
 import com.payment.validation.model.response.PaymentResponse;
 import com.payment.validation.service.PaymentValidationService;
 
@@ -39,5 +41,13 @@ public class PaymentValidationController {
 		PaymentResponse response=validationService.validatePayment(request);
 		log.info("Validation result : {}",response.getStatus());
 		return ResponseEntity.ok(response);
+	}
+	
+	@PostMapping("/initiate")
+	public ResponseEntity<PaymentProcessResponse> initiatePayment(@Valid @RequestBody PaymentRequest request)
+	{
+		log.info("REST request to initiate payment for orderId: {}", request.getOrderId());
+		PaymentProcessResponse response=validationService.initiatePayment(request);
+		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }

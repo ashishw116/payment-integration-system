@@ -20,7 +20,7 @@ public class PaymentValidationServiceApplicationTest {
 	@BeforeEach
 	void setup()
 	{
-		validationService=new PaymentValidationServiceImpl();
+		validationService=new PaymentValidationServiceImpl(null);
 	}
 	
 	@Test
