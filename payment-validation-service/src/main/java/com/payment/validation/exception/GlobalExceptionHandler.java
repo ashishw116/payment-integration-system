@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.payment.validation.model.response.ErrorResponse;
 
+import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -57,5 +58,11 @@ public class GlobalExceptionHandler {
 				.build();
 		return new ResponseEntity<>(response,HttpStatus.INTERNAL_SERVER_ERROR);
 	}
-	
+	@ExceptionHandler(FeignException.class)
+	public ResponseEntity<String> handleFeignException(FeignException ex) {
+		log.error("Upstream Microservice Error: {}", ex.contentUTF8());
+		return ResponseEntity.status(ex.status())
+				.header("Content-Type", "application/json")
+				.body(ex.contentUTF8());
+	}
 }
