@@ -6,14 +6,18 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import com.payment.processing.client.StripeProviderClient;
 import com.payment.processing.constants.PaymentConstants;
-import com.payment.processing.entity.PaymentTransaction;
+import com.payment.processing.entity.PaymentTransaction; 
 import com.payment.processing.exception.PaymentProcessingException;
 import com.payment.processing.model.TransactionStatus;
 import com.payment.processing.model.request.PaymentProcessRequest;
+import com.payment.processing.model.request.StripeCheckoutRequest;
 import com.payment.processing.model.response.PaymentProcessResponse;
+import com.payment.processing.model.response.StripeCheckoutResponse;
 import com.payment.processing.repository.PaymentTransactionRepository;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 
 	private final PaymentTransactionRepository repository;
-	
+	private final StripeProviderClient stripeClient;
 	@Transactional
 	@Override
 	public PaymentProcessResponse processPayment(PaymentProcessRequest processRequest) {
@@ -48,15 +52,44 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 				.build();
 		PaymentTransaction savedTransaction=repository.save(transaction);
 		log.info("Saved new transaction with ID: {}", savedTransaction.getTransactionId());
+		
+		StripeCheckoutRequest stripeRequest=StripeCheckoutRequest.builder()
+				.transactionId(savedTransaction.getTransactionId())
+				.amount(savedTransaction.getAmount())
+				.currency(savedTransaction.getCurrency())
+				.customerEmail(savedTransaction.getCustomerEmail())
+				.orderId(savedTransaction.getOrderId())
+				.build();
+		
+		StripeCheckoutResponse stripeResponse=callStripeService(stripeRequest);
+		if(stripeResponse.getCheckoutUrl()!=null)
+		{
+			savedTransaction.setCheckoutUrl(stripeResponse.getCheckoutUrl());
+			savedTransaction.setStripeSessionId(stripeResponse.getSessionId());
+			savedTransaction.setStatus(TransactionStatus.PROCESSING);
+			savedTransaction=repository.save(savedTransaction);
+		}
+		else
+		{
+			log.warn("Stripe checkout URL was null (possibly due to fallback). Transaction stays PENDING.");
+		}
 		return PaymentProcessResponse.builder()
 				.transactionId(savedTransaction.getTransactionId())
 				.status(savedTransaction.getStatus())
 				.orderId(savedTransaction.getOrderId())
 				.amount(savedTransaction.getAmount())
 				.currency(savedTransaction.getCurrency())
+				.checkoutUrl(savedTransaction.getCheckoutUrl())
 				.message(PaymentConstants.PAYMENT_PROCESSING_SUCCESS)
 				.createdAt(savedTransaction.getCreatedAt())
 				.build();
+	}
+	
+	@CircuitBreaker(name = "stripeService",fallbackMethod = "stripeFallBack")
+	private StripeCheckoutResponse callStripeService(StripeCheckoutRequest request)
+	{
+		log.info("Calling Stripe Provider Client for transaction: {}", request.getTransactionId());
+		return stripeClient.processStripe(request);
 	}
 
 	@Override
@@ -95,10 +128,18 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 				.build());
 	}
 	
+	public StripeCheckoutResponse stripeFallBack(StripeCheckoutRequest request,Throwable ex) {
+		log.error("Stripe service unavailable: {}", ex.getMessage());
+		return StripeCheckoutResponse.builder()
+				.status("STRIPE_UNAVAILABLE")
+				.checkoutUrl(null)
+				.build();
+	}
+	
 	@Transactional
 	@Override
 	public void updateTransaction(String transactionId, TransactionStatus status) {
-		log.info("Updat ing request for {} transaction update status to : {} ", transactionId, status);
+		log.info("Updating request for {} transaction update status to : {} ", transactionId, status);
 		PaymentTransaction transaction=repository.findByTransactionId(transactionId).orElseThrow(()->{ 
 			log.error("Updating Transection Status Failed : Transection Not Found : {} ",transactionId );
 			return new PaymentProcessingException(PaymentConstants.TRANSECTION_NOT_FOUND);
