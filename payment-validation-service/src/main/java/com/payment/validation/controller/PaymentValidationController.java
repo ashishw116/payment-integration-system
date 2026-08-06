@@ -21,7 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @RestController
-@RequestMapping("/api/payment")
+@RequestMapping("/api/v1/payment")
 @Slf4j
 @AllArgsConstructor
 @Tag(name="Payment Validation" , description = "Payment Validation APIs")
@@ -48,6 +48,8 @@ public class PaymentValidationController {
 	{
 		log.info("REST request to initiate payment for orderId: {}", request.getOrderId());
 		PaymentProcessResponse response=validationService.initiatePayment(request);
+		log.info("REST response for initiate payment orderId {}: transactionId={}, status={}", 
+				request.getOrderId(), response.getTransactionId(), response.getStatus());
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
 }

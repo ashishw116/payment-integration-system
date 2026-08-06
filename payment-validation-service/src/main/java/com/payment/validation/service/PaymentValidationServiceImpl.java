@@ -26,12 +26,15 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 	{
 		if(request.getCurrency() == null || !Currency.isValid(request.getCurrency().name()))
 		{
+			log.warn("Validation failed for orderId {}: {}", request.getOrderId(), PaymentConstants.INVALID_CURRENCY);
 			return PaymentResponse.failure(PaymentConstants.INVALID_CURRENCY);
 		}
 		if(request.getPaymentMethod() == null || !PaymentMethod.isValid(request.getPaymentMethod().name()))
 		{
+			log.warn("Validation failed for orderId {}: {}", request.getOrderId(), PaymentConstants.INVALID_PAYMENT_METHOD);
 			return PaymentResponse.failure(PaymentConstants.INVALID_PAYMENT_METHOD);
 		}
+		log.info("Payment validation successful for orderId: {}", request.getOrderId());
 		return PaymentResponse.success(PaymentConstants.PAYMENT_VALIDATION_SUCCESS, request.getAmount(), request.getCurrency(),request.getOrderId());
 	}
 
@@ -41,6 +44,7 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 		PaymentResponse validation=validatePayment(request);
 		if(validation.getStatus() == 
 	            PaymentStatus.FAILED) {
+			log.warn("Payment initiation aborted due to validation failure for orderId {}: {}", request.getOrderId(), validation.getMessage());
 	        return PaymentProcessResponse.builder()
 	            .status(TransactionStatus.FAILED)
 	            .message(validation.getMessage())
@@ -59,7 +63,8 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 		            .merchantId("MERCH001") 
 		            .build();
 		PaymentProcessResponse response=processingClient.processPayment(processRequest);
-		log.info("Payment initiated successfully for orderId: {}", request.getOrderId());
+		log.info("Payment initiated successfully for orderId: {}, transactionId: {}, status: {}", 
+				request.getOrderId(), response.getTransactionId(), response.getStatus());
 		return response;
 	}
 }
