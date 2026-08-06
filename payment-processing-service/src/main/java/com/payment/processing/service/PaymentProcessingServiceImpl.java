@@ -68,6 +68,8 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 			savedTransaction.setStripeSessionId(stripeResponse.getSessionId());
 			savedTransaction.setStatus(TransactionStatus.PROCESSING);
 			savedTransaction=repository.save(savedTransaction);
+			log.info("Stripe checkout session created for transactionId: {}, checkoutUrl: {}", 
+					savedTransaction.getTransactionId(), savedTransaction.getCheckoutUrl());
 		}
 		else
 		{
@@ -129,7 +131,7 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 	}
 	
 	public StripeCheckoutResponse stripeFallBack(StripeCheckoutRequest request,Throwable ex) {
-		log.error("Stripe service unavailable: {}", ex.getMessage());
+		log.error("Circuit Breaker Fallback: Stripe service unavailable for transactionId {}: {}", request.getTransactionId(), ex.getMessage(), ex);
 		return StripeCheckoutResponse.builder()
 				.status("STRIPE_UNAVAILABLE")
 				.checkoutUrl(null)

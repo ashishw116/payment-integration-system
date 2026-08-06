@@ -52,7 +52,7 @@ public class PaymentTransaction {
 	private TransactionStatus status;
 	@Column
 	private String stripeSessionId;
-	@Column
+	@Column(length = 2048)
 	private String checkoutUrl;
 	@Column
 	private String description;

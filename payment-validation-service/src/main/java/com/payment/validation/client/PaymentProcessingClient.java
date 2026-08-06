@@ -7,8 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import com.payment.validation.model.request.PaymentProcessRequest;
 import com.payment.validation.model.response.PaymentProcessResponse;
 
-@FeignClient(name="payment-processing-service")
+@FeignClient(name = "payment-processing-service")
 public interface PaymentProcessingClient {
-	@PostMapping("/api/processing/process")
+	@PostMapping("/api/v1/processing/process")
 	PaymentProcessResponse processPayment(@RequestBody PaymentProcessRequest processRequest);
 }
