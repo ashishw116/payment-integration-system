@@ -6,8 +6,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import com.payment.processing.model.request.StripeCheckoutRequest;
 import com.payment.processing.model.response.StripeCheckoutResponse;
-@FeignClient(name="stripe-provider-service")
+
+@FeignClient(name = "stripe-provider-service")
 public interface StripeProviderClient {
-	@PostMapping("/api/stripe/checkout")
+	@PostMapping("/api/v1/stripe/checkout")
 	StripeCheckoutResponse processStripe(@RequestBody StripeCheckoutRequest request);
 }
