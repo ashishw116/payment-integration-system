@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -44,10 +45,10 @@ public class PaymentValidationController {
 	}
 	
 	@PostMapping("/initiate")
-	public ResponseEntity<PaymentProcessResponse> initiatePayment(@Valid @RequestBody PaymentRequest request)
+	public ResponseEntity<PaymentProcessResponse> initiatePayment(@Valid @RequestBody PaymentRequest request,@RequestHeader ("X-Merchant-Id") String merchantId)
 	{
 		log.info("REST request to initiate payment for orderId: {}", request.getOrderId());
-		PaymentProcessResponse response=validationService.initiatePayment(request);
+		PaymentProcessResponse response=validationService.initiatePayment(request,merchantId);
 		log.info("REST response for initiate payment orderId {}: transactionId={}, status={}", 
 				request.getOrderId(), response.getTransactionId(), response.getStatus());
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
