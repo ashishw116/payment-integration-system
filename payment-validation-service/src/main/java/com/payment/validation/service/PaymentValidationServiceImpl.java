@@ -39,7 +39,7 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 	}
 
 	@Override
-	public PaymentProcessResponse initiatePayment(PaymentRequest request) {
+	public PaymentProcessResponse initiatePayment(PaymentRequest request,String merchantId) {
 		log.info("Initiating payment for orderId: {}", request.getOrderId());
 		PaymentResponse validation=validatePayment(request);
 		if(validation.getStatus() == 
@@ -60,7 +60,7 @@ public class PaymentValidationServiceImpl implements PaymentValidationService{
 		            .paymentMethod(request.getPaymentMethod().name())
 		            .orderId(request.getOrderId())
 		            .description(request.getDescription())
-		            .merchantId("MERCH001") 
+		            .merchantId(merchantId) 
 		            .build();
 		PaymentProcessResponse response=processingClient.processPayment(processRequest);
 		log.info("Payment initiated successfully for orderId: {}, transactionId: {}, status: {}", 

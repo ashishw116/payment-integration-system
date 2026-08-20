@@ -8,5 +8,5 @@ public interface PaymentValidationService {
 	PaymentResponse validatePayment(
 	        PaymentRequest request);
 	PaymentProcessResponse initiatePayment(
-	        PaymentRequest request);
+	        PaymentRequest request,String merchantId);
 }
