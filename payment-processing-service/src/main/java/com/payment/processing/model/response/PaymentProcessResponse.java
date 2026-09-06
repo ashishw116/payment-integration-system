@@ -1,5 +1,6 @@
 package com.payment.processing.model.response;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import com.payment.processing.model.TransactionStatus;
@@ -13,7 +14,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentProcessResponse {
+public class PaymentProcessResponse implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 	private String transactionId;
 	private TransactionStatus status;
 	private String orderId;
