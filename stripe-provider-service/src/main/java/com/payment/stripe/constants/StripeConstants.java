@@ -7,4 +7,6 @@ public class StripeConstants {
     public static final String STRIPE_ERROR = "Stripe service error";
     public static final String CHECKOUT_CREATED = "Checkout session created";
     public static final String WEBHOOK_PROCESSED = "Webhook processed";
+    public static final String EVENT_PAYMENT_SUCCESS = "PAYMENT_SUCCESS"; 
+    public static final String EVENT_PAYMENT_FAILED = "PAYMENT_FAILED";
 }

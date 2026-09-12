@@ -8,10 +8,10 @@ import com.payment.stripe.client.PaymentProcessingClient;
 import com.payment.stripe.config.StripeConfig;
 import com.payment.stripe.constants.StripeConstants;
 import com.payment.stripe.exception.StripeServiceException;
+import com.payment.stripe.messaging.PaymentEventPublisher;
 import com.payment.stripe.model.TransactionStatus;
 import com.payment.stripe.model.request.StripeCheckoutRequest;
 import com.payment.stripe.model.response.StripeCheckoutResponse;
-import com.stripe.Stripe;
 import com.stripe.exception.SignatureVerificationException;
 import com.stripe.exception.StripeException;
 import com.stripe.model.Event;
@@ -34,7 +34,8 @@ public class StripeServiceImpl implements StripeService {
 
 	private final StripeConfig stripeConfig;
 	private final PaymentProcessingClient paymentProcessingClient;
-
+	private final PaymentEventPublisher eventPublisher;
+	
 	@Override
 	public StripeCheckoutResponse createCheckoutSession(StripeCheckoutRequest request) {
 		log.info("Creating Stripe checkout session for orderId: {}, transactionId: {}", request.getOrderId(), request.getTransactionId());
@@ -126,11 +127,13 @@ public class StripeServiceImpl implements StripeService {
 					String transactionId = session.getMetadata() != null ? session.getMetadata().get("transactionId")
 							: null;
 					String orderId = session.getMetadata() != null ? session.getMetadata().get("orderId") : null;
+					String customerEmail = session.getCustomerEmail();
 					log.info("Checkout Session completed for transactionId: {}, orderId: {}, sessionId: {}",
 							transactionId, orderId, session.getId());
 					if (transactionId != null) {
 						log.info("calling update status for transactionId: {}", transactionId);
 						updateStatusSafely(transactionId, TransactionStatus.SUCCESS);
+						eventPublisher.publishPaymentSuccess(transactionId, orderId, customerEmail);
 					}
 					else 
 					{
@@ -171,10 +174,12 @@ public class StripeServiceImpl implements StripeService {
 							: null;
 					String orderId = paymentIntent.getMetadata() != null ? paymentIntent.getMetadata().get("orderId")
 							: null;
+					String customerEmail = paymentIntent.getMetadata() != null ? paymentIntent.getMetadata().get("customerEmail") : null;
 					log.info("Payment Intent failed for transactionId: {}, orderId: {}, paymentIntentId: {}",
 							transactionId, orderId, paymentIntent.getId());
 					if (transactionId != null) {
 						updateStatusSafely(transactionId, TransactionStatus.FAILED);
+						eventPublisher.publishPaymentFailed(transactionId, orderId, customerEmail);
 					} 
 					else {
 						log.warn("Missing 'transactionId' in metadata for failed payment intent ID: {}", paymentIntent.getId());
