@@ -2,6 +2,8 @@ package com.payment.processing.service;
 
 import java.util.UUID;
 
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -94,6 +96,8 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 		return stripeClient.processStripe(request);
 	}
 
+	@Cacheable(value = "transactions",
+			key = "#transactionId")
 	@Override
 	public PaymentProcessResponse getTransactionById(String  transactionId) {
 		log.info("Retriving transaction details from DB for transactionId : {} ", transactionId);
@@ -138,6 +142,8 @@ public class PaymentProcessingServiceImpl implements PaymentProcessingService{
 				.build();
 	}
 	
+	@CacheEvict(value = "transactions",
+			key = "#transactionId")
 	@Transactional
 	@Override
 	public void updateTransaction(String transactionId, TransactionStatus status) {
